@@ -23,6 +23,29 @@ const cleanResponse = (text) => {
   return text.trim();
 };
 
+// Add this helper function to clean and extract page names
+const extractPageNames = (content) => {
+  try {
+    // First try direct JSON parse
+    const cleaned = content.replace(/^[\s\S]*?\[/, '[').replace(/\][\s\S]*$/, ']');
+    const parsed = JSON.parse(cleaned);
+    
+    // Validate and format the page names
+    if (Array.isArray(parsed)) {
+      return parsed.map(page => {
+        // Convert to string, trim whitespace, and capitalize first letter
+        const pageName = String(page).trim();
+        return pageName.charAt(0).toUpperCase() + pageName.slice(1).toLowerCase();
+      }).filter(page => page.length > 0); // Remove empty strings
+    }
+  } catch (error) {
+    console.error('Error parsing page names:', error);
+  }
+  
+  // Fallback to default pages if parsing fails
+  return ["Home", "About", "Services", "Contact"];
+};
+
 app.post('/api/generate-prompts', async (req, res) => {
   try {
     console.log('Received request:', req.body);
@@ -69,9 +92,16 @@ app.post('/api/generate-prompts', async (req, res) => {
   }
 });
 
+// Update the suggest-pages endpoint to use the new extraction
 app.post('/api/suggest-pages', async (req, res) => {
   try {
-    const response = await fetch('https://cloud.olakrutrim.com/v1/chat/completions', {
+    console.log('Received request:', req.body);
+
+    if (!req.body.websiteIdea) {
+      throw new Error('Missing websiteIdea in request body');
+    }
+
+    const apiResponse = await fetch('https://cloud.olakrutrim.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,26 +112,43 @@ app.post('/api/suggest-pages', async (req, res) => {
         stream: false,
         messages: [{
           role: "user",
-          content: `Given this website/app idea: "${req.body.websiteIdea}", suggest a list of essential pages that should be included. Return the response as a JSON array of page names.`
+          content: `Given this website idea: "${req.body.websiteIdea}", suggest a list of essential pages that should be included. IMPORTANT: You must ONLY return a valid JavaScript array like ["home", "about", "blog"]. DO NOT include ANY explanations, markdown, or other text.`
         }],
         max_tokens: 1000,
         temperature: 0.7
       })
     });
 
-    const data = await response.json();
-    let suggestedPages;
-    try {
-      const cleanedContent = cleanResponse(data.choices[0].message.content);
-      suggestedPages = JSON.parse(cleanedContent);
-    } catch (e) {
-      // Fallback if JSON parsing fails
-      suggestedPages = ["Home", "About", "Features", "Contact"];
+    if (!apiResponse.ok) {
+      const errorText = await apiResponse.text();
+      console.error('API Error:', errorText);
+      throw new Error(`API responded with status ${apiResponse.status}`);
     }
-    res.json({ suggestedPages });
+
+    const data = await apiResponse.json();
+    console.log('API Response:', data);
+
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('Invalid API response structure');
+    }
+
+    const content = data.choices[0].message.content;
+    const suggestedPages = extractPageNames(content);
+    
+    const result = { 
+      suggestedPages,
+      isDefaultResponse: suggestedPages.length === 4 && suggestedPages[0] === "Home"
+    };
+    
+    console.log('Sending response:', result);
+    res.json(result);
+
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Failed to suggest pages' });
+    console.error('Error in endpoint:', error);
+    res.status(500).json({ 
+      error: 'Failed to suggest pages',
+      details: error.message 
+    });
   }
 });
 

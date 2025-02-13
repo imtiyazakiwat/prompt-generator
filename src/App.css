@@ -580,13 +580,3 @@
 .custom-page-input {
   margin-top: 2rem;
 }
-
-.generate-button.regenerate {
-  background: linear-gradient(45deg, #ff6b6b, #ee5253);
-}
-
-.generate-button.regenerate:hover {
-  background: linear-gradient(45deg, #ee5253, #ff6b6b);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(238, 82, 83, 0.4);
-}

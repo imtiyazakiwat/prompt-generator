@@ -59,7 +59,6 @@ function App() {
   const [expandedPrompt, setExpandedPrompt] = useState<ExpandedPrompt | null>(null);
   const [generatingPages, setGeneratingPages] = useState<Set<string>>(new Set());
   const [customPages, setCustomPages] = useState<string[]>([]);
-  const [hasGenerated, setHasGenerated] = useState(false);
 
   const generatePrompts = async () => {
     if (!userInput.trim()) {
@@ -112,7 +111,6 @@ function App() {
       };
 
       setResponse(formattedResponse);
-      setHasGenerated(true);
     } catch (error) {
       console.error('Error:', error);
       setError(error instanceof Error ? error.message : 'An error occurred');
@@ -209,15 +207,6 @@ function App() {
     });
   };
 
-  const handleRegenerate = () => {
-    setResponse(null);
-    setSelectedPages([]);
-    setExpandedPrompt(null);
-    setGeneratingPages(new Set());
-    setCustomPages([]);
-    setHasGenerated(false);
-  };
-
   return (
     <div className="App">
       <div className="gradient-background">
@@ -234,22 +223,13 @@ function App() {
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
             />
-            {hasGenerated ? (
-              <button 
-                className="generate-button regenerate"
-                onClick={handleRegenerate}
-              >
-                Regenerate Prompts
-              </button>
-            ) : (
-              <button 
-                className="generate-button"
-                onClick={generatePrompts}
-                disabled={isLoading || !userInput.trim()}
-              >
-                {isLoading ? 'Generating...' : 'Generate Prompts'}
-              </button>
-            )}
+            <button 
+              className="generate-button"
+              onClick={generatePrompts}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Generating...' : 'Generate Prompts'}
+            </button>
           </div>
 
           {isLoading && (
