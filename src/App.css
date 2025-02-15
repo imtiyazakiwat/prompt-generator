@@ -246,12 +246,18 @@
   padding: 1.5rem;
   line-height: 1.6;
   color: #e0e0e0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .formatted-paragraph {
   margin: 0.8rem 0;
   color: #e0e0e0;
   line-height: 1.8;
+  text-align: left;
 }
 
 .formatted-list-item {
@@ -260,6 +266,7 @@
   position: relative;
   line-height: 1.6;
   list-style: none;
+  text-align: left;
 }
 
 .formatted-list-item::before {
@@ -277,28 +284,86 @@
   letter-spacing: 0.5px;
 }
 
+.formatted-content h2,
+.formatted-content h3,
+.formatted-content p,
+.formatted-content ul,
+.formatted-content li {
+  margin: 0.8rem 0;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
 .formatted-content h2 {
   color: #4facfe;
   font-size: 1.5rem;
   margin: 1.5rem 0 1rem;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .formatted-content h3 {
   color: #ffffff;
   font-size: 1.2rem;
   margin: 1rem 0;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .formatted-content p {
   margin: 0.8rem 0;
   line-height: 1.6;
   color: #e0e0e0;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .formatted-content li {
-  margin: 0.5rem 0 0.5rem 1.5rem;
-  line-height: 1.5;
-  color: #e0e0e0;
+  margin: 0.8rem 0;
+  padding-left: 0.5rem;
+  line-height: 1.8;
+  display: list-item;
+  position: relative;
+}
+
+.formatted-content li p {
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.formatted-content ul {
+  list-style-type: disc;
+  padding-left: 2.5rem;
+  margin: 1rem 0;
+  width: calc(100% - 2.5rem);
+  box-sizing: border-box;
+}
+
+.formatted-content ul li::marker {
+  color: #4facfe;
+  font-size: 1.2em;
+}
+
+.formatted-content ul ul {
+  margin: 0.5rem 0 0.5rem 1rem;
+}
+
+.formatted-content li > * {
+  display: inline-block;
+  vertical-align: top;
+  width: 100%;
 }
 
 .copy-button {
@@ -461,12 +526,22 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
+  width: 100%;
+  margin-top: 1rem;
 }
 
 .page-prompt-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 400px;
   overflow: hidden;
 }
 
@@ -475,19 +550,110 @@
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 
-.page-prompt-card .formatted-content.preview {
-  max-height: 200px;
-  overflow: hidden;
-  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-}
-
 .page-prompt-card .formatted-content {
-  max-height: 300px;
-  overflow-y: auto;
-  padding: 1.2rem;
+  flex: 1;
+  padding: 1rem;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 8px;
   margin: 0.5rem 0;
+  text-align: left;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  word-break: break-word;
+  white-space: pre-wrap;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.formatted-content p,
+.formatted-content ul,
+.formatted-content li,
+.formatted-content h2,
+.formatted-content h3 {
+  margin: 0.8rem 0;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  max-width: 100%;
+}
+
+.formatted-content ul {
+  list-style-type: disc;
+  padding-left: 2.5rem;
+  margin: 1rem 0;
+  width: calc(100% - 2.5rem);
+}
+
+.formatted-content li {
+  margin: 0.8rem 0;
+  padding-left: 0.5rem;
+  line-height: 1.8;
+  display: list-item;
+  position: relative;
+}
+
+.formatted-content li p {
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.formatted-content ul li::marker {
+  color: #4facfe;
+  font-size: 1.2em;
+}
+
+.formatted-content ul ul {
+  margin: 0.5rem 0 0.5rem 1rem;
+}
+
+.formatted-content li > * {
+  display: inline-block;
+  vertical-align: top;
+  width: 100%;
+}
+
+.formatted-content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.formatted-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.formatted-content::-webkit-scrollbar-thumb {
+  background: rgba(79, 172, 254, 0.4);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.formatted-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(79, 172, 254, 0.6);
+}
+
+.formatted-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79, 172, 254, 0.4) rgba(255, 255, 255, 0.05);
+}
+
+.page-prompt-card .formatted-content.preview {
+  max-height: 300px;
+  overflow-y: scroll;
+  position: relative;
+  padding-bottom: 2rem;
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
 }
 
 .card-footer {
@@ -540,7 +706,16 @@
 .modal-body {
   padding: 1.5rem;
   overflow-y: auto;
-  max-height: calc(90vh - 140px);
+  max-height: calc(80vh - 200px);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.modal-body .formatted-content {
+  max-height: calc(80vh - 200px);
+  overflow-y: auto;
+  padding: 1.5rem;
+  margin: 0;
 }
 
 .modal-footer {
