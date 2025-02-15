@@ -14,13 +14,19 @@ interface ExpandedPrompt {
 
 // Helper function to clean the response text
 const cleanResponseText = (text: string): string => {
-  // Remove everything between <think> tags including the tags
-  const cleanedText = text.replace(/<think>[\s\S]*?<\/think>/g, '')
-    // Remove any remaining XML/HTML-like tags
+  const cleanedText = text
+    // Remove everything between <think> tags including the tags
+    .replace(/<think>[\s\S]*?<\/think>/g, '')
+    // Remove any XML/HTML-like tags
     .replace(/<[^>]*>/g, '')
-    // Remove multiple consecutive newlines
+    // Remove markdown headings (#)
+    .replace(/^#+\s*/gm, '')
+    // Remove asterisks and underscores (bold/italic markdown)
+    .replace(/[*_]/g, '')
+    // Remove special characters but keep basic punctuation and dashes for lists
+    .replace(/[^\w\s.,!?():\-]/g, '')
+    // Clean up list formatting
     .replace(/\n{3,}/g, '\n\n')
-    // Remove leading/trailing whitespace
     .trim();
   
   return cleanedText;
@@ -186,24 +192,31 @@ function App() {
   }, []);
 
   const formatResponse = (text: string) => {
-    return text.split('---').map((section, index) => {
-      const lines = section.trim().split('\n');
-      return (
-        <div key={index} className="response-section">
-          {lines.map((line, lineIndex) => {
-            if (line.startsWith('###')) {
-              return <h2 key={lineIndex}>{line.replace('###', '').trim()}</h2>;
-            } else if (line.startsWith('**') && line.endsWith('**')) {
-              return <h3 key={lineIndex}>{line.replace(/\*\*/g, '').trim()}</h3>;
-            } else if (line.startsWith('-')) {
-              return <li key={lineIndex}>{line.substring(1).trim()}</li>;
-            } else if (line.trim()) {
-              return <p key={lineIndex}>{line}</p>;
-            }
-            return null;
-          })}
-        </div>
-      );
+    return text.split('\n').map((line, index) => {
+      const trimmedLine = line.trim();
+      
+      if (!trimmedLine) {
+        return <br key={index} />;
+      }
+      
+      // Section headers (all caps lines)
+      if (trimmedLine.toUpperCase() === trimmedLine && trimmedLine.length > 3 && trimmedLine.length < 50) {
+        return <h3 key={index} className="section-title">
+          {trimmedLine.charAt(0).toUpperCase() + trimmedLine.slice(1).toLowerCase()}
+        </h3>;
+      }
+      
+      // Convert all list items to bullet points
+      if (trimmedLine.startsWith('• ') || /^\d+\.?\s/.test(trimmedLine)) {
+        return (
+          <li key={index} className="formatted-list-item">
+            {trimmedLine.replace(/^[•\d]+\.?\s*/, '')}
+          </li>
+        );
+      }
+      
+      // Regular paragraph
+      return <p key={index} className="formatted-paragraph">{trimmedLine}</p>;
     });
   };
 
